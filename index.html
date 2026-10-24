@@ -1,0 +1,643 @@
+<!doctype html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/png" href="logo psdh.png" />
+    <title>Alden IoT Dashboard</title>
+    <link rel="stylesheet" href="styles.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet" />
+</head>
+
+<body>
+    <div class="top-bar">
+        <div class="connection-pill">
+            <span class="status-dot disconnected" id="status-dot"></span>
+            <span id="status-text">Terputus</span>
+        </div>
+    </div>
+
+    <button id="sidebar-toggle" class="sidebar-toggle">⚙️ Pengaturan</button>
+
+    <div id="sidebar-backdrop" class="sidebar-backdrop"></div>
+
+    <aside id="sliding-sidebar" class="sliding-sidebar">
+        <button id="close-sidebar" class="close-sidebar">✖</button>
+        <h2>Pengaturan Tanaman</h2>
+        
+        <div class="form-group">
+            <label for="plant-type">Jenis Tanaman</label>
+            <select id="plant-type">
+                <option value="pakcoy">Pakcoy</option>
+                <option value="selada">Selada</option>
+                <option value="bayam">Bayam</option>
+            </select>
+        </div>
+        
+        <div class="form-group">
+            <label for="plant-age">Fase Pertumbuhan</label>
+            <select id="plant-age">
+                <option value="semaian">Semaian</option>
+                <option value="remaja">Remaja</option>
+                <option value="dewasa">Dewasa / Panen</option>
+            </select>
+        </div>
+        
+        <div class="target-info">
+            <p>Target Nutrisi Ideal:</p>
+            <h3 id="target-tds-display">500 - 800 ppm</h3>
+        </div>
+
+        <div class="form-group">
+            <label>Isi Pupuk (50ml)</label>
+            <input type="text" id="kode-pupuk" placeholder="Masukkan sandi..." autocomplete="off" />
+            <p id="peringatan-pupuk" class="peringatan-pupuk" role="alert" aria-live="polite"></p>
+            <div class="btn-container">
+                <button id="btn-pupuk">Kirim Instruksi</button>
+            </div>
+        </div>
+    
+    </aside>
+
+    <main class="main-content">
+        <header class="hero">
+            <img src="logo psdh.png" alt="Logo" style="mix-blend-mode: multiply; width: 200px; height: auto" class="main-logo" />
+            <h1>Sistem Monitoring IoT</h1>
+            <p class="subtitle">Alden, Khalil dan Rasya</p>
+        </header>
+
+      <div class="stats-grid">
+        <div class="stat-card">
+            <div class="card-icon tds">💧</div>
+            <h3>Nutrisi Cair (TDS)</h3>
+            <div class="value-container">
+              <span class="value" id="val-tds">---</span>
+              <span class="unit">ppm</span>
+            </div>
+            <div class="warning-tds" id="warning-tds"></div>
+            <div class="last-updated">
+              Update: <span id="time-tds">--:--</span>
+            </div>    
+          </div>
+
+        <div class="stat-card">
+          <div class="card-icon water-temp">🌫️</div>
+          <h3>Kelembapan Udara</h3>
+          <div class="value-container">
+            <span class="value" id="val-water-temp">--.-</span>
+            <span class="unit">°C</span>
+          </div>
+          <div class="warning-water" id="warning-water"></div>
+          <div class="last-updated">
+            Update: <span id="time-water-temp">--:--</span>
+          </div>
+        </div>
+ 
+        <div class="stat-card">
+          <div class="card-icon air-temp">☁️</div>
+          <h3>Suhu Udara</h3>
+          <div class="value-container">
+            <span class="value" id="val-air-temp">--.-</span>
+            <span class="unit">°C</span>
+          </div>
+          <div class="value-note" id="note-air-temp"></div>
+          <div class="last-updated">
+            Update: <span id="time-air-temp">--:--</span>
+          </div>
+          <div class="warning-air" id="warning-air"></div>
+        </div>
+
+        <div class="stat-card">
+          <div class="card-icon water-level">🌊</div>
+          <h3>Level Air</h3>
+          <div class="value-container">
+            <span class="value" id="val-water-level">----</span>
+            <span class="unit"></span>
+          </div>
+          <div class="warning-tinggi" id="warning-tinggi"></div>
+          <div class="last-updated">
+            Update: <span id="time-water-level">--:--</span>
+          </div>
+        </div>
+
+        <!-- FIX: Memindahkan Kartu Intensitas Cahaya masuk ke dalam stats-grid -->
+
+      </div> <!-- Penutup stats-grid yang benar -->
+      <div class="stat-card">
+        <div class="card-icon cahaya">☀</div> <!-- FIX: Class icon disesuaikan -->
+        <h3>Intensitas Cahaya</h3>
+        <div class="value-container">
+          <span class="value" id="val-cahaya">---</span>
+          <span class="unit">lux</span>
+        </div>
+        <!-- FIX: ID dan class disesuaikan agar unik (tidak duplikat dengan TDS) -->
+        <div class="warning-cahaya" id="warning-cahaya"></div>
+        <div class="last-updated">
+          Update: <span id="time-intensitas-cahaya">--:--</span>
+        </div>    
+      </div>
+
+      <section class="device-status">
+            <h2>Status Perangkat</h2>
+            <div class="device-table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Nomor Seri</th>
+                            <th>Status Koneksi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>POVI#1</td>
+                            <td>
+                                <span class="status-badge" id="badge-12345A">Terputus</span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2026 Riset Alden dkk.</p>
+    </footer>
+
+    <script src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script>
+    <script>
+        (function requestNotifOnFirstLoad() {
+            if (!("Notification" in window)) return;
+            if (Notification.permission === "default") {
+                Notification.requestPermission().catch(() => {});
+            }
+        })();
+
+        // SIDEBAR LOGIC
+        const sidebar = document.getElementById('sliding-sidebar');
+        const backdrop = document.getElementById('sidebar-backdrop');
+        const toggleBtn = document.getElementById('sidebar-toggle');
+        const closeBtn = document.getElementById('close-sidebar');
+
+        function toggleSidebar() {
+            sidebar.classList.toggle('active');
+            backdrop.classList.toggle('active');
+        }
+
+        toggleBtn.addEventListener('click', toggleSidebar);
+        closeBtn.addEventListener('click', toggleSidebar);
+        backdrop.addEventListener('click', toggleSidebar);
+
+        const clientId = "web_client_" + Math.random().toString(16).substr(2, 8);
+        const host = "wss://broker.emqx.io:8084/mqtt";
+
+        const options = {
+            keepalive: 60,
+            clientId: clientId,
+            protocolId: "MQTT",
+            protocolVersion: 4,
+            clean: true,
+            reconnectPeriod: 2000,
+            connectTimeout: 30 * 1000,
+        };
+
+        const client = mqtt.connect(host, options);
+        let tdsNotificationScheduled = false;
+        let waterNotificationScheduled = false;
+        let airNotificationScheduled = false;
+        let heightNotificationScheduled = false;
+        
+        const tdsDatabase = {
+            pakcoy: {
+                semaian: { min: 500, max: 800 },
+                remaja: { min: 800, max: 1050 },
+                dewasa: { min: 1050, max: 1400 }
+            },
+            selada: {
+                semaian: { min: 300, max: 500 },
+                remaja: { min: 500, max: 700 },
+                dewasa: { min: 560, max: 840 }
+            },
+            bayam: {
+                semaian: { min: 400, max: 600 },
+                remaja: { min: 800, max: 1000 },
+                dewasa: { min: 1200, max: 1600 }
+            }
+        };
+
+        let currentTdsMin = 500;
+        let currentTdsMax = 800;
+
+        function updateTdsTarget() {
+            const plant = document.getElementById('plant-type').value;
+            const age = document.getElementById('plant-age').value;
+            
+            currentTdsMin = tdsDatabase[plant][age].min;
+            currentTdsMax = tdsDatabase[plant][age].max;
+            
+            document.getElementById('target-tds-display').innerText = `${currentTdsMin} - ${currentTdsMax} ppm`;
+            
+            const tdsEl = document.getElementById("val-tds");
+            if(tdsEl && tdsEl.innerText !== "---") {
+                // FIX: Membuang parameter "null" yang tidak terpakai
+                applyThresholdColor(tdsEl, document.getElementById("warning-tds"));
+            }
+        }
+
+        document.getElementById('plant-type').addEventListener('change', updateTdsTarget);
+        document.getElementById('plant-age').addEventListener('change', updateTdsTarget);
+        updateTdsTarget();
+
+        function updateTime(id) {
+            const el = document.getElementById(id);
+            if (!el) return;
+            const now = new Date();
+            const timeStr =
+                now.getHours().toString().padStart(2, "0") +
+                ":" +
+                now.getMinutes().toString().padStart(2, "0") +
+                ":" +
+                now.getSeconds().toString().padStart(2, "0");
+            el.innerText = timeStr;
+        }
+
+        // FIX: Menghapus argumen "threshold" karena ambang batas diatur oleh variabel global
+        function applyThresholdColor(el, warningTdsEl) {
+            const raw = (el?.innerText ?? "").toString().trim();
+            const normalized = raw.replace(",", ".");
+            const match = normalized.match(/-?\d+(\.\d+)?/);
+            const num = match ? Number(match[0]) : NaN;
+
+            el?.classList?.remove("is-high", "is-low");
+            if (!Number.isFinite(num)) {
+                if (warningTdsEl) warningTdsEl.innerText = "";
+                return;
+            }
+            
+            if (num < currentTdsMin) {
+                if (warningTdsEl) warningTdsEl.innerText = "Nutrisi kurang!";
+                el?.classList?.add("is-low");
+
+                if (!tdsNotificationScheduled) {
+                    tdsNotificationScheduled = true;
+                    Notification.requestPermission().then((permission) => {
+                        if (permission === "granted") {
+                            setTimeout(() => {
+                                new Notification("Peringatan IoT!", {
+                                    body: `Nutrisi kurang! Target minimum: ${currentTdsMin} ppm.`,
+                                    icon: "logo psdh.png",
+                                });
+                                tdsNotificationScheduled = false;
+                            }, 30 * 60 * 1000); 
+                        } else {
+                            tdsNotificationScheduled = false;
+                        }
+                    });
+                }
+            } else if (num > currentTdsMax) {
+                if (warningTdsEl) warningTdsEl.innerText = "Nutrisi berlebih!";
+                el?.classList?.add("is-low"); 
+            } else {
+                if (warningTdsEl) warningTdsEl.innerText = "Normal";
+                el.classList.add("is-high"); 
+                tdsNotificationScheduled = false;
+            }
+        }
+
+        function applyWaterTemp(tempEl, warningWaterEl, minOk = 18, maxOk = 27) {
+            const raw = (tempEl?.innerText ?? "").toString().trim();
+            const normalized = raw.replace(",", ".");
+            const match = normalized.match(/-?\d+(\.\d+)?/);
+            const num = match ? Number(match[0]) : NaN;
+
+            tempEl?.classList?.remove("is-high", "is-low");
+            if (!Number.isFinite(num)) {
+                if (warningWaterEl) warningWaterEl.innerText = "";
+                return;
+            }
+
+            if (num < minOk) {
+                if (warningWaterEl) warningWaterEl.innerText = "Suhu air terlalu dingin!";
+                tempEl?.classList?.add("is-low"); 
+            } else if (num > maxOk) {
+                if (warningWaterEl) warningWaterEl.innerText = "Suhu air terlalu panas!";
+                tempEl?.classList?.add("is-low"); 
+                if (!waterNotificationScheduled) {
+                    waterNotificationScheduled = true;
+                    Notification.requestPermission().then((permission) => {
+                        if (permission === "granted") {
+                            setTimeout(() => {
+                                new Notification("Halo!", {
+                                    body: "Suhu air terlalu panas!",
+                                    icon: "logo psdh.png",
+                                });
+                                waterNotificationScheduled = false;
+                            }, 30 * 60 * 1000); 
+                        } else {
+                            waterNotificationScheduled = false;
+                        }
+                    });
+                }
+            } else {
+                if (warningWaterEl) warningWaterEl.innerText = "Normal";
+                tempEl?.classList?.add("is-high"); 
+            }
+        }
+
+        function applyWaterHigh(tempEl, warningTinggi) {
+            const raw = (tempEl?.innerText ?? "").toString().trim();
+            const normalized = raw.replace(",", ".");
+            const match = normalized.match(/-?\d+(\.\d+)?/);
+            const num = match ? Number(match[0]) : NaN;
+
+            tempEl?.classList?.remove("is-high", "is-low");
+            if (!Number.isFinite(num)) {
+                if (warningTinggi) warningTinggi.innerText = "";
+                return;
+            }
+
+            if (num < 30) {
+                if (warningTinggi) warningTinggi.innerText = "air kurang banyak!";
+                tempEl?.classList?.add("is-low"); 
+                if (!heightNotificationScheduled) {
+                    heightNotificationScheduled = true;
+                    Notification.requestPermission().then((permission) => {
+                        if (permission === "granted") {
+                            setTimeout(() => {
+                                new Notification("Halo!", {
+                                    body: "air kurang banyak!",
+                                    icon: "logo psdh.png",
+                                });
+                                heightNotificationScheduled = false;
+                            }, 30 * 60 * 1000); 
+                        } else {
+                            heightNotificationScheduled = false;
+                        }
+                    });
+                }
+            }else {
+                if (warningTinggi) warningTinggi.innerText = "Normal";
+                tempEl?.classList?.add("is-high"); 
+            }
+        }
+
+        function applyAirTemp(tempEl, minOk = 18, maxOk = 30) {
+            const raw = (tempEl?.innerText ?? "").toString().trim();
+            const normalized = raw.replace(",", ".");
+            const match = normalized.match(/-?\d+(\.\d+)?/);
+            const num = match ? Number(match[0]) : NaN;
+
+            tempEl?.classList?.remove("is-high", "is-low");
+            if (!Number.isFinite(num)) return;
+
+            if (num < minOk || num > maxOk) {
+                tempEl?.classList?.add("is-low"); 
+            } else {
+                tempEl?.classList?.add("is-high"); 
+            }
+        }
+
+        function applyAirTempNote(tempEl, noteEl, warningAirEl) {
+            if (!tempEl) return;
+            const raw = (tempEl.innerText ?? "").toString().trim();
+            const normalized = raw.replace(",", ".");
+            const match = normalized.match(/-?\d+(\.\d+)?/);
+            const num = match ? Number(match[0]) : NaN;
+
+            if (!Number.isFinite(num)) {
+                if (noteEl) noteEl.innerText = "";
+                if (warningAirEl) warningAirEl.innerText = "";
+                return;
+            }
+
+            if (num < 18) {
+                if (noteEl) noteEl.innerText = "Udara terlalu dingin";
+                if (warningAirEl) warningAirEl.innerText = "suhu diluar dingin!";
+                tempEl.classList.remove("is-high", "is-low");
+                tempEl.classList.add("is-low");
+            } else if (num > 30) {
+                if (noteEl) noteEl.innerText = "Udara terlalu panas";
+                if (warningAirEl) warningAirEl.innerText = "suhu diluar panas!";
+                tempEl.classList.remove("is-high", "is-low");
+                tempEl.classList.add("is-low");
+                if (!airNotificationScheduled) {
+                    airNotificationScheduled = true;
+                    Notification.requestPermission().then((permission) => {
+                        if (permission === "granted") {
+                            setTimeout(() => {
+                                new Notification("Halo!", {
+                                    body: "suhu diluar panas!",
+                                    icon: "logo psdh.png",
+                                });
+                                airNotificationScheduled = false;
+                            }, 30 * 60 * 1000); 
+                        } else {
+                            airNotificationScheduled = false;
+                        }
+                    });
+                }
+            } else {
+                if (noteEl) noteEl.innerText = "Normal";
+                if (warningAirEl) warningAirEl.innerText = "";
+                tempEl.classList.remove("is-high", "is-low");
+                tempEl.classList.add("is-high");
+            }
+        }
+        function applyIntensitasCahaya(cahayaEl) {
+            const raw = (cahayaEl?.innerText ?? "").toString().trim();
+            const normalized = raw.replace(",", ".");
+            const match = normalized.match(/-?\d+(\.\d+)?/);
+            const num = match ? Number(match[0]) : NaN;
+
+            cahayaEl?.classList?.remove("is-high", "is-low");
+            if (!Number.isFinite(num)) return;
+
+            if (num < 100) {
+                cahayaEl?.classList?.add("is-low"); 
+            } else {
+                cahayaEl?.classList?.add("is-high"); 
+            }
+
+        }
+            
+        client.on("connect", () => {
+            console.log("Terhubung ke broker: " + clientId);
+            client.subscribe("pstdh/#", { qos: 1 });
+            
+            document.getElementById("status-text").innerText = "Terhubung";
+            document
+                .getElementById("status-dot")
+                .classList.replace("disconnected", "connected");
+        });
+
+        client.on("offline", () => {
+            document.getElementById("status-text").innerText = "Terputus";
+            document
+                .getElementById("status-dot")
+                .classList.replace("connected", "disconnected");
+        });
+
+        client.on("reconnect", () => {
+            document.getElementById("status-text").innerText = "Menyambung...";
+            const dot = document.getElementById("status-dot");
+            dot.classList.remove("connected");
+            dot.classList.add("disconnected");
+        });
+
+        client.on("close", () => {
+            document.getElementById("status-text").innerText = "Terputus";
+            const dot = document.getElementById("status-dot");
+            dot.classList.remove("connected");
+            dot.classList.add("disconnected");
+        });
+
+        client.on("error", (err) => {
+            console.error("MQTT error:", err);
+            document.getElementById("status-text").innerText = "Error MQTT";
+            const dot = document.getElementById("status-dot");
+            dot.classList.remove("connected");
+            dot.classList.add("disconnected");
+        });
+
+        function decodeMessage(message) {
+            if (typeof message === "string") return message;
+            if (message && typeof message.toString === "function") return message.toString("utf8");
+            try {
+                return new TextDecoder("utf-8").decode(message);
+            } catch (e) {
+                return String(message);
+            }
+        }
+
+        client.on("message", (topic, message) => {
+            const data = decodeMessage(message);
+            const topicNorm = (topic || "").trim().toLowerCase();
+
+            const statusText = document.getElementById("status-text");
+            const statusDot = document.getElementById("status-dot");
+            if (statusText) statusText.innerText = "Terhubung";
+            if (statusDot) {
+                statusDot.classList.remove("disconnected");
+                statusDot.classList.add("connected");
+            }
+
+            console.log("TOPIC :", topic, "TEXT :", data);
+            
+            try {
+                if (topicNorm === "pstdh/air") {
+                    const el = document.getElementById("val-water-level");
+                    const warningTinggi = document.getElementById("warning-tinggi");
+                    if (el) {
+                        el.innerText = data;
+                        applyWaterHigh(el, warningTinggi);
+                        updateTime("time-water-level");
+                    }
+                } else if (topicNorm === "pstdh/tds") {
+                    const el = document.getElementById("val-tds");
+                    const warningTds = document.getElementById("warning-tds");
+                    if (el) {
+                        el.innerText = data;
+                        // FIX: Menghapus angka '130' karena threshold sudah diatur fungsi secara internal
+                        applyThresholdColor(el, warningTds);
+                        updateTime("time-tds");
+                    }
+                } else if (topicNorm === "pstdh/suhuudara") {
+                    const el = document.getElementById("val-air-temp");
+                    const noteAir = document.getElementById("note-air-temp");
+                    const warningAir = document.getElementById("warning-air");
+                    if (el) {
+                        el.innerText = data;
+                        applyAirTemp(el);
+                        applyAirTempNote(el, noteAir, warningAir);
+                        updateTime("time-air-temp");
+                    }
+                } else if (topicNorm === "pstdh/suhuair") {
+                    const el = document.getElementById("val-water-temp");
+                    if (el) {
+                        el.innerText = data;
+                        applyWaterTemp(el, document.getElementById("warning-water"), 18, 30);
+                        updateTime("time-water-temp");
+                    }
+                } else if (topicNorm === "pstdh/12345a") {
+                    const badge = document.getElementById("badge-12345A");
+                    if (badge) {
+                        badge.innerText = data;
+                        badge.className = data === "Terhubung" ? "status-badge active" : "status-badge";
+                    }
+                } else if (topicNorm === "pstdh/cahaya") {
+                    const el = document.getElementById("val-cahaya");
+                    const warningCahaya = document.getElementById("warning-cahaya");
+                    if (el) {
+                        el.innerText = data;
+                        applyIntensitasCahaya(el);
+                        // FIX: Memanggil updateTime dengan ID yang kini sudah dideklarasikan di HTML
+                        updateTime("time-intensitas-cahaya");
+                    }
+                } else {
+                    console.warn("Topik tidak dikenali:", topic);
+                }
+            } catch (err) {
+                console.error("Error saat update dari topik", topic, err);
+            }
+        });
+
+        // LOGIKA PENGIRIMAN PASSWORD PUPUK
+        const SANDI_PUPUK = "ISI50ML";
+        const inputPupuk = document.getElementById("kode-pupuk");
+        const btnPupuk = document.getElementById("btn-pupuk");
+        const peringatanPupuk = document.getElementById("peringatan-pupuk");
+
+        function setPeringatanPupuk(pesan, tipe) {
+            peringatanPupuk.innerText = pesan;
+            peringatanPupuk.classList.remove("is-error", "is-success");
+            inputPupuk.classList.remove("is-invalid", "is-valid");
+
+            if (tipe === "error") {
+                peringatanPupuk.classList.add("is-error");
+                inputPupuk.classList.add("is-invalid");
+            } else if (tipe === "success") {
+                peringatanPupuk.classList.add("is-success");
+                inputPupuk.classList.add("is-valid");
+            }
+        }
+
+        function kirimInstruksiPupuk() {
+            const kode = inputPupuk.value.trim();
+
+            if (!kode) {
+                setPeringatanPupuk("Sandi tidak boleh kosong.", "error");
+                inputPupuk.focus();
+                return;
+            }
+
+            if (kode !== SANDI_PUPUK) {
+                setPeringatanPupuk("Sandi salah. Instruksi tidak dikirim.", "error");
+                inputPupuk.focus();
+                return;
+            }
+
+            if (!client.connected) {
+                setPeringatanPupuk("Gagal mengirim. Dasbor sedang terputus dari server.", "error");
+                return;
+            }
+
+            client.publish("pstdh/isi_pupuk", kode, { qos: 1 });
+            inputPupuk.value = "";
+            setPeringatanPupuk("Instruksi terkirim. Menunggu respon alat...", "success");
+        }
+
+        btnPupuk.addEventListener("click", kirimInstruksiPupuk);
+        inputPupuk.addEventListener("keydown", function (event) {
+            if (event.key === "Enter") {
+                event.preventDefault();
+                kirimInstruksiPupuk();
+            }
+        });
+        inputPupuk.addEventListener("input", function () {
+            setPeringatanPupuk("", "");
+        });
+    </script>
+</body>
+
+</html>
