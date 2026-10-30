@@ -112,8 +112,8 @@
           <div class="card-icon water-level">🌊</div>
           <h3>Level Air</h3>
           <div class="value-container">
-            <span class="value" id="val-water-level">----</span>
-            <span class="unit"></span>
+            <span class="value" id="val-water-level">---</span>
+            <span class="unit">CM</span>
           </div>
           <div class="warning-tinggi" id="warning-tinggi"></div>
           <div class="last-updated">
@@ -357,7 +357,7 @@
                 return;
             }
 
-            if (num < 30) {
+            if (num < 1) {
                 if (warningTinggi) warningTinggi.innerText = "air kurang banyak!";
                 tempEl?.classList?.add("is-low"); 
                 if (!heightNotificationScheduled) {
@@ -376,7 +376,10 @@
                         }
                     });
                 }
-            }else {
+            } else if (num > 10) {
+                if (warningTinggi) warningTinggi.innerText = "air terlalu banyak!";
+                tempEl?.classList?.add("is-low"); 
+            } else {
                 if (warningTinggi) warningTinggi.innerText = "Normal";
                 tempEl?.classList?.add("is-high"); 
             }
@@ -444,18 +447,23 @@
                 tempEl.classList.add("is-high");
             }
         }
-        function applyIntensitasCahaya(cahayaEl) {
+        function applyIntensitasCahaya(cahayaEl, warningCahayaEl) {
             const raw = (cahayaEl?.innerText ?? "").toString().trim();
             const normalized = raw.replace(",", ".");
             const match = normalized.match(/-?\d+(\.\d+)?/);
             const num = match ? Number(match[0]) : NaN;
 
             cahayaEl?.classList?.remove("is-high", "is-low");
-            if (!Number.isFinite(num)) return;
+            if (!Number.isFinite(num)) {
+                if (warningCahayaEl) warningCahayaEl.innerText = "";
+                return;
+            }
 
-            if (num < 100) {
+            if (num < 100) {    
+                if (warningCahayaEl) warningCahayaEl.innerText = "Cuaca Mendung!";
                 cahayaEl?.classList?.add("is-low"); 
             } else {
+                if (warningCahayaEl) warningCahayaEl.innerText = "Normal";
                 cahayaEl?.classList?.add("is-high"); 
             }
 
@@ -556,7 +564,7 @@
                     const el = document.getElementById("val-water-temp");
                     if (el) {
                         el.innerText = data;
-                        applyWaterTemp(el, document.getElementById("warning-water"), 18, 30);
+                        applyWaterTemp(el, document.getElementById("warning-water"), 50, 80);
                         updateTime("time-water-temp");
                     }
                 } else if (topicNorm === "pstdh/12345a") {
@@ -570,7 +578,7 @@
                     const warningCahaya = document.getElementById("warning-cahaya");
                     if (el) {
                         el.innerText = data;
-                        applyIntensitasCahaya(el);
+                        applyIntensitasCahaya(el, warningCahaya);
                         // FIX: Memanggil updateTime dengan ID yang kini sudah dideklarasikan di HTML
                         updateTime("time-intensitas-cahaya");
                     }
