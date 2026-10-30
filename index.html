@@ -444,18 +444,23 @@
                 tempEl.classList.add("is-high");
             }
         }
-        function applyIntensitasCahaya(cahayaEl) {
+        function applyIntensitasCahaya(cahayaEl, warningCahayaEl) {
             const raw = (cahayaEl?.innerText ?? "").toString().trim();
             const normalized = raw.replace(",", ".");
             const match = normalized.match(/-?\d+(\.\d+)?/);
             const num = match ? Number(match[0]) : NaN;
 
             cahayaEl?.classList?.remove("is-high", "is-low");
-            if (!Number.isFinite(num)) return;
+            if (!Number.isFinite(num)) {
+                if (warningCahayaEl) warningCahayaEl.innerText = "";
+                return;
+            }
 
             if (num < 100) {
+                if (warningCahayaEl) warningCahayaEl.innerText = "Cuaca Mendung!";
                 cahayaEl?.classList?.add("is-low"); 
             } else {
+                if (warningCahayaEl) warningCahayaEl.innerText = "Normal";
                 cahayaEl?.classList?.add("is-high"); 
             }
 
@@ -570,7 +575,7 @@
                     const warningCahaya = document.getElementById("warning-cahaya");
                     if (el) {
                         el.innerText = data;
-                        applyIntensitasCahaya(el);
+                        applyIntensitasCahaya(el, warningCahaya);
                         // FIX: Memanggil updateTime dengan ID yang kini sudah dideklarasikan di HTML
                         updateTime("time-intensitas-cahaya");
                     }
