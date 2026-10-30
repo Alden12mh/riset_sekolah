@@ -86,7 +86,7 @@
           <h3>Kelembapan Udara</h3>
           <div class="value-container">
             <span class="value" id="val-water-temp">--.-</span>
-            <span class="unit">°C</span>
+            <span class="unit">%</span>
           </div>
           <div class="warning-water" id="warning-water"></div>
           <div class="last-updated">
@@ -305,7 +305,7 @@
             }
         }
 
-        function applyWaterTemp(tempEl, warningWaterEl, minOk = 18, maxOk = 27) {
+        function applyWaterTemp(tempEl, warningWaterEl, minOk = 50, maxOk = 80) {
             const raw = (tempEl?.innerText ?? "").toString().trim();
             const normalized = raw.replace(",", ".");
             const match = normalized.match(/-?\d+(\.\d+)?/);
@@ -318,10 +318,10 @@
             }
 
             if (num < minOk) {
-                if (warningWaterEl) warningWaterEl.innerText = "Suhu air terlalu dingin!";
+                if (warningWaterEl) warningWaterEl.innerText = "Kelembapan udara Terlalu kering!";
                 tempEl?.classList?.add("is-low"); 
             } else if (num > maxOk) {
-                if (warningWaterEl) warningWaterEl.innerText = "Suhu air terlalu panas!";
+                if (warningWaterEl) warningWaterEl.innerText = "Kelembapan udara Terlalu lembab!";
                 tempEl?.classList?.add("is-low"); 
                 if (!waterNotificationScheduled) {
                     waterNotificationScheduled = true;
